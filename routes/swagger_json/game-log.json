@@ -1,9 +1,3 @@
-const express = require('express');
-const router = express.Router();
-const webapiController = require('../controllers/nhlWebAPIController');
-
-/**
-* @swagger
 {
     "/nhl-GPT/api/game-log": {
         "get": {
@@ -92,7 +86,3 @@ const webapiController = require('../controllers/nhlWebAPIController');
         }
     }
 }
-*/
-router.get('/game-log', webapiController.getGameLog);
-
-module.exports = router;
