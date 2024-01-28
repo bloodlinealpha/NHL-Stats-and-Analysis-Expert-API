@@ -8,17 +8,29 @@ const swaggerOptions  = {
     definition:{
         openapi: '3.0.0',
         info:{
-            title: 'REST API for my App',
+            title: 'BloodLineAlpha NHL GPT API',
             version: '1.0.0',
-            description: 'This is the REST API for my product',
+            description: 'This API provides access to NHL Game Log data for use in the BloodLineAlpha NHL GPT Action Builder',
         },
+        servers: [
+            {
+                url: 'https://bloodlinealpha.com/',
+                description: 'GPT Action Builder API Server' 
+            }
+        ],
     },
     apis:['./routes/*.js'],
 }
 
+// create swagger docs
 const swaggerSpec = swaggerJSDoc(swaggerOptions);
-
+// serve interactive swagger docs 
 app.use('/nhl-GPT/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// serve OpenAPI Specification docs - USED for the GPT Actiosn builder
+app.get('/nhl-GPT/api-docs.json', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(swaggerSpec);
+});
 
 // Import routes
 const nhlWebAPIRoute = require('./routes/nhlWebAPI');
