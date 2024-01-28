@@ -1,3 +1,4 @@
+const fetch = require('node-fetch');
 
 exports.getGameLog = async (req, res) => {
     const { playerId, seasonId, gameTypeId } = req.params;
@@ -39,6 +40,8 @@ async function gameLogRequest(playerId, seasonId, gameTypeId=2){
         const response = await fetch(url, options);
         // check status code
         if(response.status !== 200){
+            console.error(response.status);
+            console.error(response.statusText);
             throw new Error('Error: ' + response.status);
         }
         const data = await response.json();
@@ -47,7 +50,8 @@ async function gameLogRequest(playerId, seasonId, gameTypeId=2){
         return newData;
     } catch (error) {
         console.log(error);
-        return {error};
+        console.error(error);
+        return {error: "Error: Could not fetch game log data from server"};
     }
 }
 
