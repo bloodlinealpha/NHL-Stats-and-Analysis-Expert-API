@@ -14,7 +14,11 @@ const swaggerOptions  = {
         servers: [
             {
                 url: 'https://bloodlinealpha.com',
-                description: 'GPT Action Builder API Server' 
+                description: 'GPT Action Builder API Production Server' 
+            },
+            {
+                url: 'http://localhost:3000',
+                description: 'Local Development Server',
             }
         ],
     },
