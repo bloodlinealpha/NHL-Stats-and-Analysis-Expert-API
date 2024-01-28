@@ -1,7 +1,7 @@
 {
   "name": "NHL-Stats-and-Analysis-Expert-API",
   "version": "1.0.0",
-  "description": "",
+  "description": "API Wrapper for the NHL Stats and Analysis Expert GPT. Transform NHL Web API data into a formatting that can be better used by the GPT Actions.",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
@@ -9,7 +9,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "bloodlinealpha",
+  "author": "BloodLineAlpha Development",
   "license": "ISC",
   "dependencies": {
     "express": "^4.18.2",

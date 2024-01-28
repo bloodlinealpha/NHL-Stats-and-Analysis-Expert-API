@@ -1,5 +1,7 @@
 const fetch = require('node-fetch');
 
+// GET /nhl-GPT/api/game-log route to retrieve game log data for a specific player, season, and game type.
+// Overrides the existing NHL Web API game log data to remove unnecessary properties and add additional properties.
 exports.getGameLog = async (req, res) => {
     const playerId = req.query?.playerId;
     const seasonId = req.query?.seasonId;

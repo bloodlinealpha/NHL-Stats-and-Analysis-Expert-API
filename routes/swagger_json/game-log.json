@@ -38,7 +38,7 @@
                     "name": "properties",
                     "in": "query",
                     "required": false,
-                    "description": "Comma-separated list of properties to include in the response. Returns all properties, if not used. Possible values are gameId, goal, assists, commonName, opponentCommonName, points, plusMinus, powerPlayGoals, powerPlayPoints, gameWinningGoals, otGoals, shots, shifts, shorthandedGoals, shorthandedPoints, pim, toi.",
+                    "description": "Comma-separated list of properties to include in the response. Use when trying to find specific stat values. Returns all properties, if not used. Possible values are gameId, goal, assists, commonName, opponentCommonName, points, plusMinus, powerPlayGoals, powerPlayPoints, gameWinningGoals, otGoals, shots, shifts, shorthandedGoals, shorthandedPoints, pim, toi.",
                     "schema": {
                         "type": "string"
                     }
