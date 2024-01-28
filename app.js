@@ -18,15 +18,15 @@ const swaggerOptions  = {
 
 const swaggerSpec = swaggerJSDoc(swaggerOptions);
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/nhl-GPT/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Import routes
 const nhlWebAPIRoute = require('./routes/nhlWebAPI');
 
 // Use routes
-app.use('/api', nhlWebAPIRoute);
+app.use('/nhl-GPT/api', nhlWebAPIRoute);
 
-app.get('/', function(req, res) {
+app.get('/nhl-GPT/', function(req, res) {
     res.status(200).send('Hello World!');
 });
 

@@ -5,7 +5,7 @@ const webapiController = require('../controllers/nhlWebAPIController');
 
 /**
  * @swagger
- * /api/nhl/game-log/{playerId}/{seasonId}/{gameTypeId}:
+ * /nhl-GPT/api/game-log/{playerId}/{seasonId}/{gameTypeId}:
  *   get:
  *     summary: Get game logs
  *     description: Retrieve game log data for a specific player, season, and game type.
