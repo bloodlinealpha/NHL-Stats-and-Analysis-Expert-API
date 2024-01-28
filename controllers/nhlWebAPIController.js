@@ -1,12 +1,15 @@
 const fetch = require('node-fetch');
 
 exports.getGameLog = async (req, res) => {
-    const { playerId, seasonId, gameTypeId } = req.params;
+    const playerId = req.query?.playerId;
+    const seasonId = req.query?.seasonId;
+    const gameTypeId  = req.query?.gameTypeId;
     const queryProperties = req.query?.properties?.split(',') ?? [];
     const queryLimit = req.query?.limit;
+
     let isAggregate = req.query?.isAggregate;
-    if(isAggregate === undefined ){
-        return res.status(400).json({error: 'isAggregate query parameter is required'});
+    if(!playerId || !seasonId || !gameTypeId || !isAggregate ){
+        return res.status(400).json({error: 'playerId, seasonId, gameTypeId, and isAggregate query parameters are required'});
     }else if(isAggregate !== 'true' && isAggregate !== 'false'){
         return res.status(400).json({error: 'isAggregate query parameter must be true or false'});
     }else{

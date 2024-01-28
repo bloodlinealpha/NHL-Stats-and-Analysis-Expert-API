@@ -10,11 +10,10 @@ const swaggerOptions  = {
         info:{
             title: 'BloodLineAlpha NHL GPT API',
             version: '1.0.0',
-            description: 'This API provides access to NHL Game Log data for use in the BloodLineAlpha NHL GPT Action Builder',
         },
         servers: [
             {
-                url: 'https://bloodlinealpha.com/',
+                url: 'https://bloodlinealpha.com',
                 description: 'GPT Action Builder API Server' 
             }
         ],
