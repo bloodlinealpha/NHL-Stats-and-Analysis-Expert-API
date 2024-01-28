@@ -7,6 +7,7 @@ exports.getGameLog = async (req, res) => {
     const queryProperties = req.query?.properties?.split(',') ?? [];
     const queryLimit = req.query?.limit;
 
+    // check required query parameters
     let isAggregate = req.query?.isAggregate;
     if(!playerId || !seasonId || !gameTypeId || !isAggregate ){
         return res.status(400).json({error: 'playerId, seasonId, gameTypeId, and isAggregate query parameters are required'});
@@ -16,9 +17,10 @@ exports.getGameLog = async (req, res) => {
         isAggregate = isAggregate === 'true';
     }
 
-    
+    // request game log data from NHL Web API
     const gameLogs = await gameLogRequest(playerId, seasonId, gameTypeId);
     if(gameLogs.error){
+        console.log(gameLogs.error);
         return res.status(500).json(gameLogs);
     }
 
@@ -33,7 +35,15 @@ exports.getGameLog = async (req, res) => {
 
 // helper functions
 
-// fetch game log data from NHL API and remove unnecessary properties
+/**
+ * Fetches the game log data for a specific player, season, and game type from the NHL Web API. Removes unnecessary properties from request.
+ *
+ * @param {number} playerId - The ID of the player.
+ * @param {number} seasonId - The ID of the season.
+ * @param {number} [gameTypeId=2] - The ID of the game type. Defaults to 2.
+ * @returns {Promise<Object>} A promise that resolves to an object containing the game log, game type ID, and season ID. If an error occurs, it resolves to an object with an error message.
+ * @throws {Error} If the HTTP status code of the response is not 200.
+ */
 async function gameLogRequest(playerId, seasonId, gameTypeId=2){
     const url = `https://api-web.nhle.com/v1/player/${playerId}/game-log/${seasonId}/${gameTypeId}`;
     const options = {
@@ -52,12 +62,21 @@ async function gameLogRequest(playerId, seasonId, gameTypeId=2){
         const newData = {gameLog: data.gameLog, gameTypeId: data.gameTypeId, seasonId: data.seasonId};
         return newData;
     } catch (error) {
-        console.log(error);
         console.error(error);
         return {error: "Error: Could not fetch game log data from server"};
     }
 }
 
+/**
+ * Transforms the game log based on the provided query properties, limit, and aggregation flag.
+ *
+ * @param {Object[]} gameLogs - The game logs to be transformed.
+ * @param {string[]} queryProperties - The properties to be included in the transformed game logs.
+ * @param {number} queryLimit - The maximum number of game logs to be returned.
+ * @param {boolean} isAggregate - A flag indicating whether the game logs should be aggregated into a single log.
+ * @returns {Object} The transformed game logs. If invalid properties are provided, an error object is returned.
+ * @throws {Error} If the queryProperties include properties not allowed.
+ */
 async function transformGameLog(gameLogs, queryProperties, queryLimit, isAggregate){
     // get the number of games
     let gameCount = gameLogs?.gameLog?.length;
@@ -73,15 +92,16 @@ async function transformGameLog(gameLogs, queryProperties, queryLimit, isAggrega
     }
 
     // combine default properties and query properties
-    let properties = defaultProperties.concat(queryProperties);
+    let propertiesToInclude = defaultProperties.concat(queryProperties);
     // add all properties if the properties param is not used
     if(queryProperties.length === 0){
-        properties = defaultProperties.concat(allowedProperties);
+        propertiesToInclude = defaultProperties.concat(allowedProperties);
     }
     
+    // re-map game log data to only include the properties specified
     const transformedGameLog = gameLogs.gameLog.map(game => {
         const transformedGame = {};
-        properties.forEach(property => {
+        propertiesToInclude.forEach(property => {
             transformedGame[property] = game[property];
         });
         return transformedGame;
@@ -95,7 +115,7 @@ async function transformGameLog(gameLogs, queryProperties, queryLimit, isAggrega
         newGameLogs.gameCount = parseInt(queryLimit);
     }
 
-    // aggregate game logs
+    // combine game logs if necessary
     if(isAggregate){
         const aggregateGameLogs = aggregateGameLog(newGameLogs);
         newGameLogs.gameLog = aggregateGameLogs;
@@ -104,6 +124,15 @@ async function transformGameLog(gameLogs, queryProperties, queryLimit, isAggrega
     return newGameLogs;
 }
 
+
+/**
+ * Aggregates the game logs into a single game log.
+ * 
+ * @param {Object} gameLogs - The game logs to be aggregated.
+ * @returns {Object} The aggregated game logs.
+ * @throws {Error} If the game logs are not valid.
+ * @throws {Error} If the game logs cannot be aggregated.
+*/
 function aggregateGameLog(gameLogs){
     const aggregateProperties = ["goals", "assists", "points", "plusMinus", "powerPlayGoals", "powerPlayPoints", "gameWinningGoals", "otGoals", "shots", "shifts", "shorthandedGoals", "shorthandedPoints", "pim", "toi"];
     const gameLogProperties = Object.keys(gameLogs.gameLog[0]);
@@ -137,6 +166,8 @@ function aggregateGameLog(gameLogs){
 
     return aggregateGameLogs;
 }
+
+
 
 // sample game log data
 // {
