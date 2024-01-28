@@ -6,15 +6,26 @@ exports.getGameLog = async (req, res) => {
     const gameTypeId  = req.query?.gameTypeId;
     const queryProperties = req.query?.properties?.split(',') ?? [];
     const queryLimit = req.query?.limit;
+    
+    let isAggregate = req.query?.isAggregate;
+    let isAscending = req.query?.isAscending;
+    
 
     // check required query parameters
-    let isAggregate = req.query?.isAggregate;
-    if(!playerId || !seasonId || !gameTypeId || !isAggregate ){
-        return res.status(400).json({error: 'playerId, seasonId, gameTypeId, and isAggregate query parameters are required'});
-    }else if(isAggregate !== 'true' && isAggregate !== 'false'){
+    if(!playerId || !seasonId || !gameTypeId || !isAggregate || !isAscending ){
+        return res.status(400).json({error: 'playerId, seasonId, gameTypeId, isAggregate, and isAscending query parameters are required'});
+    }
+    
+    if(isAggregate !== 'true' && isAggregate !== 'false'){
         return res.status(400).json({error: 'isAggregate query parameter must be true or false'});
     }else{
         isAggregate = isAggregate === 'true';
+    }
+
+    if(isAscending !== 'true' && isAscending !== 'false'){
+        return res.status(400).json({error: 'isAscending query parameter must be true or false'});
+    }else{
+        isAscending = isAscending === 'true';
     }
 
     // request game log data from NHL Web API
@@ -25,7 +36,7 @@ exports.getGameLog = async (req, res) => {
     }
 
     // transform game log data using query properties
-    const transformGameLogs = await transformGameLog(gameLogs, queryProperties, queryLimit, isAggregate);
+    const transformGameLogs = await transformGameLog(gameLogs, queryProperties, queryLimit, isAggregate, isAscending);
     if(transformGameLogs.error){
         return res.status(500).json(transformGameLogs);
     }
@@ -74,10 +85,11 @@ async function gameLogRequest(playerId, seasonId, gameTypeId=2){
  * @param {string[]} queryProperties - The properties to be included in the transformed game logs.
  * @param {number} queryLimit - The maximum number of game logs to be returned.
  * @param {boolean} isAggregate - A flag indicating whether the game logs should be aggregated into a single log.
+ * @param {boolean} isAscending - A flag indicating whether the game logs should be returned in ascending order.
  * @returns {Object} The transformed game logs. If invalid properties are provided, an error object is returned.
  * @throws {Error} If the queryProperties include properties not allowed.
  */
-async function transformGameLog(gameLogs, queryProperties, queryLimit, isAggregate){
+async function transformGameLog(gameLogs, queryProperties, queryLimit, isAggregate, isAscending){
     // get the number of games
     let gameCount = gameLogs?.gameLog?.length;
     // these are properties that are always returned
@@ -108,7 +120,14 @@ async function transformGameLog(gameLogs, queryProperties, queryLimit, isAggrega
     });
 
     // create a copy of gameLogs and update gameLog property
-    const newGameLogs = { ...gameLogs, gameLog: transformedGameLog, gameCount: gameCount, isAggregate: false};
+    const newGameLogs = { ...gameLogs, gameLog: transformedGameLog, gameCount: gameCount, isAggregate: false, isAscending: isAscending};
+
+    // reverse the order of the game logs if necessary
+    if(isAscending){// needs to be performer before queryLimit
+        // update the order to oldest-newest
+        newGameLogs.gameLog = newGameLogs.gameLog.reverse();
+    }
+
     // limit the number of game logs
     if(queryLimit){
         newGameLogs.gameLog = newGameLogs.gameLog.slice(0, queryLimit);
@@ -120,7 +139,8 @@ async function transformGameLog(gameLogs, queryProperties, queryLimit, isAggrega
         const aggregateGameLogs = aggregateGameLog(newGameLogs);
         newGameLogs.gameLog = aggregateGameLogs;
         newGameLogs.isAggregate = true;
-    }    
+    }
+
     return newGameLogs;
 }
 

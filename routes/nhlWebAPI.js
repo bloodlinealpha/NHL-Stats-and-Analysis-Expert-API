@@ -68,6 +68,16 @@ const webapiController = require('../controllers/nhlWebAPIController');
                         "type": "boolean",
                         "default": false
                     }
+                },
+                {
+                    "name": "isAscending",
+                    "in": "query",
+                    "required": true,
+                    "description": "Changes the order of the game logs, default behaviour is descending. If true, the game logs will be returned from least recent to most recent. If false, the game logs will be returned from most recent to least recent.",
+                    "schema": {
+                        "type": "boolean",
+                        "default": false
+                    }
                 }
             ],
             "responses": {
